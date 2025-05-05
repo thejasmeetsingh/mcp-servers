@@ -24,19 +24,19 @@ from schema import (
 load_dotenv()
 BASE_URL = os.getenv("RAWG_API_BASE_URL")
 API_KEY = os.getenv("RAWG_API_KEY")
-RAWG_RESULT_PAGE_SIZE = 10
+RAWG_RESULT_PAGE_SIZE = 5
 
 
 @asynccontextmanager
-async def lifespan(server: FastMCP):
+async def lifespan(_: FastMCP):
     """
     Initialize an async httpx client which will part of the request content.
     And it'll be used in all the methods for fetching data from RAWG API service
     """
 
     if not BASE_URL or not API_KEY:
-        raise ValueError("RAWG API service credentials are not configured in the enviorment." \
-        "Please check your enviorment varriables and try again.")
+        raise ValueError("RAWG API service credentials are not configured in the environment."
+                         "Please check your environment variables and try again.")
 
     try:
         headers = {
@@ -49,10 +49,16 @@ async def lifespan(server: FastMCP):
             "page_size": RAWG_RESULT_PAGE_SIZE
         }
 
-        async with AsyncClient(base_url=BASE_URL, headers=headers, params=default_params, timeout=30) as client:
+        async with AsyncClient(
+            base_url=BASE_URL,
+            headers=headers,
+            params=default_params,
+            timeout=30
+        ) as client:
             yield client
     except Exception as e:
-        raise ValueError(f"Error caught while calling RAWG API service: {str(e)}")
+        raise ValueError(
+            f"Error caught while calling RAWG API service: {str(e)}") from e
     finally:
         await client.aclose()
 
@@ -61,7 +67,7 @@ async def lifespan(server: FastMCP):
 mcp = FastMCP(name="rawg-db-mcp", lifespan=lifespan)
 
 
-@mcp.resource(uri="/genres")
+@mcp.tool()
 async def get_video_games_genre_list(ctx: Context, page: int = 1) -> GenreListResponse:
     """
     Get list of video game genres. Like: Action, Adventure, Indie etc
@@ -93,22 +99,23 @@ async def get_video_games_genre_list(ctx: Context, page: int = 1) -> GenreListRe
             ]
         )
     except Exception as e:
-        raise ValueError(f"Error caught while fetching the genre list: {str(e)}")
+        raise ValueError(
+            f"Error caught while fetching the genre list: {str(e)}") from e
 
 
-@mcp.resource(uri="/genre-details")
-async def get_video_game_genre_detail(ctx: Context, id: int) -> GenreResponse:
+@mcp.tool()
+async def get_video_game_genre_detail(ctx: Context, genre_id: int) -> GenreResponse:
     """
     Get detail of a video game genres, Like its name, description and related image
 
     Args:
-        id: An integer representing the genre ID
+        genre_id: An integer representing the genre ID
     """
 
     client: AsyncClient = ctx.request_context.lifespan_context
 
     try:
-        response = await client.get(f"/genres/{id}")
+        response = await client.get(f"/genres/{genre_id}")
         response.raise_for_status()
         response = response.json()
 
@@ -119,10 +126,11 @@ async def get_video_game_genre_detail(ctx: Context, id: int) -> GenreResponse:
             description=response["description"],
         )
     except Exception as e:
-        raise ValueError(f"Error caught while fetching the genre detail: {str(e)}")
+        raise ValueError(
+            f"Error caught while fetching the genre detail: {str(e)}") from e
 
 
-@mcp.resource(uri="/platforms")
+@mcp.tool()
 async def get_video_game_platforms(ctx: Context, page: int = 1) -> PlatformListResponse:
     """
     Get list of a video game platforms, Like: PS4, PS2, Xbox, PC etc.
@@ -154,10 +162,11 @@ async def get_video_game_platforms(ctx: Context, page: int = 1) -> PlatformListR
             ]
         )
     except Exception as e:
-        raise ValueError(f"Error caught while fetching the platform list: {str(e)}")
+        raise ValueError(
+            f"Error caught while fetching the platform list: {str(e)}") from e
 
 
-@mcp.resource(uri="games/")
+@mcp.tool()
 async def get_video_games_list(
     ctx: Context,
     page: int = 1,
@@ -174,19 +183,21 @@ async def get_video_games_list(
     Args:
         page: An integer representing the page number that needs to be fetched from the service.
         search: An optional string which contains the search query.
-        
-        platforms: An optional comma-seperated string,
+
+        platforms: An optional comma-separated string,
                     To perform filter on the games list by platform IDs. Like: 4,5 or 5.
 
-        genres: An optional comma-seperated string,
-                To perform filter on the games list by genre IDs or names. Like: 1,2 or 4 or action or action,indie.
+        genres: An optional comma-separated string,
+                To perform filter on the games list by genre IDs or names.
+                Like: 1,2 or 4 or action or action,indie.
 
-        dates: An optional comma-seperated string,
-                To perform filter on the games list by release date. Like: 2010-01-01,2018-12-31 or 2010-01-01
-        
-        metacritic: An optional comma-seperated string,
+        dates: An optional comma-separated string,
+                To perform filter on the games list by release date.
+                Like: 2010-01-01,2018-12-31 or 2010-01-01
+
+        metacritic: An optional comma-separated string,
                         To perform filter on the games list by metacritic rating. Like: 80,100
-        
+
         ordering: An optional string for performing ordering on the games list.
                     The string value should be the following fields names:
                     - name
@@ -194,7 +205,7 @@ async def get_video_games_list(
                     - created
                     - rating
                     - metacritic
-                
+
                 You can reverse the sort order by adding a hyphen, Like: -released
     """
 
@@ -249,13 +260,15 @@ async def get_video_games_list(
             ]
         )
     except Exception as e:
-        raise ValueError(f"Error caught while fetching the games list: {str(e)}")
+        raise ValueError(
+            f"Error caught while fetching the games list: {str(e)}") from e
 
 
-@mcp.resource(uri="/additions")
+@mcp.tool()
 async def get_video_game_additions(ctx: Context, game_id: int, page: int = 1) -> GameListResponse:
     """
-    Get a list of additions or DLC's for the given game ID, GOTY and other editions, companion apps, etc.
+    Get a list of additions or DLC's for the given game ID, GOTY and other editions,
+    companion apps, etc.
 
     Args:
         game_id: An integer containing the ID of a game.
@@ -297,10 +310,11 @@ async def get_video_game_additions(ctx: Context, game_id: int, page: int = 1) ->
             ]
         )
     except Exception as e:
-        raise ValueError(f"Error caught while fetching the additions of a game: {str(e)}")
+        raise ValueError(
+            f"Error caught while fetching the additions of a game: {str(e)}") from e
 
 
-@mcp.resource(uri="/game-series")
+@mcp.tool()
 async def get_video_game_series(ctx: Context, game_id: int, page: int = 1) -> GameListResponse:
     """
     Get a list of games that are part of the same series based on the given game ID.
@@ -345,11 +359,16 @@ async def get_video_game_series(ctx: Context, game_id: int, page: int = 1) -> Ga
             ]
         )
     except Exception as e:
-        raise ValueError(f"Error caught while fetching the series of a game: {str(e)}")
+        raise ValueError(
+            f"Error caught while fetching the series of a game: {str(e)}") from e
 
 
-@mcp.resource(uri="/game-screenshots")
-async def get_video_game_screenshots(ctx: Context, game_id: int, page: int = 1) -> GameScreenshotListResponse:
+@mcp.tool()
+async def get_video_game_screenshots(
+    ctx: Context,
+    game_id: int,
+    page: int = 1
+) -> GameScreenshotListResponse:
     """
     Get screenshots or images for the given game ID.
 
@@ -380,13 +399,18 @@ async def get_video_game_screenshots(ctx: Context, game_id: int, page: int = 1) 
             ]
         )
     except Exception as e:
-        raise ValueError(f"Error caught while fetching the screenshots of a game: {str(e)}")
+        raise ValueError(
+            f"Error caught while fetching the screenshots of a game: {str(e)}") from e
 
 
-@mcp.resource(uri="/game-trailers")
-async def get_video_game_trailers(ctx: Context, game_id: int, page: int = 1) -> GameTrailerListResponse:
+@mcp.tool()
+async def get_video_game_trailers(
+    ctx: Context,
+    game_id: int,
+    page: int = 1
+) -> GameTrailerListResponse:
     """
-    Get a list of trailers/movies/gameplays etc of a given game ID.
+    Get a list of trailers/movies/gameplay etc of a given game ID.
 
     Args:
         game_id: An integer containing the ID of a game.
@@ -414,10 +438,11 @@ async def get_video_game_trailers(ctx: Context, game_id: int, page: int = 1) -> 
             ]
         )
     except Exception as e:
-        raise ValueError(f"Error caught while fetching the trailers of a game: {str(e)}")
+        raise ValueError(
+            f"Error caught while fetching the trailers of a game: {str(e)}") from e
 
 
-@mcp.resource(uri="/game-details")
+@mcp.tool()
 async def get_video_game_details(ctx: Context, game_id: int) -> GameDetailResponse:
     """
     Get details of the game.
@@ -452,4 +477,5 @@ async def get_video_game_details(ctx: Context, game_id: int) -> GameDetailRespon
             platforms=response.get("platforms", [])
         )
     except Exception as e:
-        raise ValueError(f"Error caught while fetching the details of a game: {str(e)}")
+        raise ValueError(
+            f"Error caught while fetching the details of a game: {str(e)}") from e
