@@ -73,6 +73,6 @@ class GameDetailResponse(GameResponse):
     name_original: str
     description: str
     metacritic_platforms: list[dict[str, Any]]
-    website: HttpUrl
+    website: HttpUrl | None
     alternative_names: list[str]
     platforms: list[dict[str, Any]]

@@ -470,7 +470,7 @@ async def get_video_game_details(ctx: Context, game_id: int) -> GameDetailRespon
                 for metacritic_platform in response.get("metacritic_platforms", [])
             ],
             released=response["released"],
-            website=response["website"],
+            website=response["website"] if response["website"] else None,
             rating=response["rating"],
             playtime=response["playtime"],
             esrb_rating=response["esrb_rating"]["name"] if response.get(
