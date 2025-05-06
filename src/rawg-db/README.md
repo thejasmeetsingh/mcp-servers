@@ -76,7 +76,8 @@ This tool allows you to query comprehensive video game information directly thro
     - "Tell me about the developer of Elden Ring"
     - "What platforms is Cyberpunk 2077 available on?"
 
-<video controls src="https://ja3-projects.s3.ap-south-1.amazonaws.com/rawg-db-mcp.mp4" title="demo"></video>
+[![](https://github.com/user-attachments/assets/5d2a15f9-cb45-42f8-9f59-a017127ddda0)](https://ja3-projects.s3.ap-south-1.amazonaws.com/rawg-db-mcp.mp4)
+
 
 ## Troubleshooting
 
