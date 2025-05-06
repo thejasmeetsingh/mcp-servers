@@ -87,5 +87,6 @@ If you encounter issues:
 - Check API key validity
 - Inspect Docker logs with docker logs `rawg-db`
 
-<hr>
-*For more information about Claude's MCP capabilities, please refer to the official documentation.*
+---
+
+_For more information about Claude's MCP capabilities, please refer to the official documentation_
