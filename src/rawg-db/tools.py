@@ -1,6 +1,8 @@
 import os
+import json
 from contextlib import asynccontextmanager
 
+import redis.asyncio as redis
 from httpx import AsyncClient
 from mcp.server.fastmcp import FastMCP, Context
 from dotenv import load_dotenv
@@ -24,7 +26,9 @@ from schema import (
 load_dotenv()
 BASE_URL = os.getenv("RAWG_API_BASE_URL")
 API_KEY = os.getenv("RAWG_API_KEY")
+
 RAWG_RESULT_PAGE_SIZE = 5
+CACHE_EXP = 3600
 
 
 @asynccontextmanager
@@ -49,22 +53,25 @@ async def lifespan(_: FastMCP):
             "page_size": RAWG_RESULT_PAGE_SIZE
         }
 
-        async with AsyncClient(
+        client = AsyncClient(
             base_url=BASE_URL,
             headers=headers,
             params=default_params,
             timeout=30
-        ) as client:
-            yield client
+        )
+        cache = await redis.Redis(host="redis", decode_responses=True)
+
+        yield {"client": client, "cache": cache}
     except Exception as e:
-        raise ValueError(
-            f"Error caught while calling RAWG API service: {str(e)}") from e
+        print(e)
+        raise ValueError(str(e)) from e
     finally:
         await client.aclose()
+        await cache.aclose()
 
 
 # Create MCP server instance
-mcp = FastMCP(name="rawg-db-mcp", lifespan=lifespan)
+mcp = FastMCP(name="rawg-db", lifespan=lifespan)
 
 
 @mcp.tool()
@@ -76,12 +83,24 @@ async def get_video_games_genre_list(ctx: Context, page: int = 1) -> GenreListRe
         page: An integer representing the page number that needs to be fetched from the service.
     """
 
-    client: AsyncClient = ctx.request_context.lifespan_context
+    client: AsyncClient = ctx.request_context.lifespan_context["client"]
+    cache: redis.Redis = ctx.request_context.lifespan_context["cache"]
 
     try:
-        response = await client.get("/genres", params={"page": page})
-        response.raise_for_status()
-        response = response.json()
+        # Fetch the data from the cache first
+        key = f"genres:{page}"
+        response = await cache.get(key)
+
+        # Parsed the data if found in cache else retrieve the data from API
+        # And set it into cache
+        if response:
+            response = json.loads(response)
+        else:
+            response = await client.get("/genres", params={"page": page})
+            response.raise_for_status()
+            response = response.json()
+
+            await cache.set(key, json.dumps(response), ex=CACHE_EXP)
 
         await ctx.report_progress(75, 100)
 
@@ -112,12 +131,24 @@ async def get_video_game_genre_detail(ctx: Context, genre_id: int) -> GenreRespo
         genre_id: An integer representing the genre ID
     """
 
-    client: AsyncClient = ctx.request_context.lifespan_context
+    client: AsyncClient = ctx.request_context.lifespan_context["client"]
+    cache: redis.Redis = ctx.request_context.lifespan_context["cache"]
 
     try:
-        response = await client.get(f"/genres/{genre_id}")
-        response.raise_for_status()
-        response = response.json()
+        # Fetch the data from the cache first
+        key = f"genres/{genre_id}"
+        response = await cache.get(key)
+
+        # Parsed the data if found in cache else retrieve the data from API
+        # And set it into cache
+        if response:
+            response = json.loads(response)
+        else:
+            response = await client.get(f"/genres/{genre_id}")
+            response.raise_for_status()
+            response = response.json()
+
+            await cache.set(key, json.dumps(response), ex=CACHE_EXP)
 
         return GenreResponse(
             id=response["id"],
@@ -139,12 +170,24 @@ async def get_video_game_platforms(ctx: Context, page: int = 1) -> PlatformListR
         page: An integer representing the page number that needs to be fetched from the service.
     """
 
-    client: AsyncClient = ctx.request_context.lifespan_context
+    client: AsyncClient = ctx.request_context.lifespan_context["client"]
+    cache: redis.Redis = ctx.request_context.lifespan_context["cache"]
 
     try:
-        response = await client.get("/platforms", params={"page": page})
-        response.raise_for_status()
-        response = response.json()
+        # Fetch the data from the cache first
+        key = f"platforms:{page}"
+        response = await cache.get(key)
+
+        # Parsed the data if found in cache else retrieve the data from API
+        # And set it into cache
+        if response:
+            response = json.loads(response)
+        else:
+            response = await client.get("/platforms", params={"page": page})
+            response.raise_for_status()
+            response = response.json()
+
+            await cache.set(key, json.dumps(response), ex=CACHE_EXP)
 
         return PlatformListResponse(
             count=response["count"],
@@ -209,7 +252,7 @@ async def get_video_games_list(
                 You can reverse the sort order by adding a hyphen, Like: -released
     """
 
-    client: AsyncClient = ctx.request_context.lifespan_context
+    client: AsyncClient = ctx.request_context.lifespan_context["client"]
 
     try:
         params = {"page": page, "exclude_stores": True}
@@ -274,12 +317,24 @@ async def get_video_game_additions(ctx: Context, game_id: int, page: int = 1) ->
         page: An integer representing the page number that needs to be fetched from the service.
     """
 
-    client: AsyncClient = ctx.request_context.lifespan_context
+    client: AsyncClient = ctx.request_context.lifespan_context["client"]
+    cache: redis.Redis = ctx.request_context.lifespan_context["cache"]
 
     try:
-        response = await client.get(f"/games/{game_id}/additions", params={"page": page})
-        response.raise_for_status()
-        response = response.json()
+        # Fetch the data from the cache first
+        key = f"additions/{game_id}:{page}"
+        response = await cache.get(key)
+
+        # Parsed the data if found in cache else retrieve the data from API
+        # And set it into cache
+        if response:
+            response = json.loads(response)
+        else:
+            response = await client.get(f"/games/{game_id}/additions", params={"page": page})
+            response.raise_for_status()
+            response = response.json()
+
+            await cache.set(key, json.dumps(response), ex=CACHE_EXP)
 
         return GameListResponse(
             count=response["count"],
@@ -322,12 +377,24 @@ async def get_video_game_series(ctx: Context, game_id: int, page: int = 1) -> Ga
         page: An integer representing the page number that needs to be fetched from the service.
     """
 
-    client: AsyncClient = ctx.request_context.lifespan_context
+    client: AsyncClient = ctx.request_context.lifespan_context["client"]
+    cache: redis.Redis = ctx.request_context.lifespan_context["cache"]
 
     try:
-        response = await client.get(f"/games/{game_id}/game-series", params={"page": page})
-        response.raise_for_status()
-        response = response.json()
+        # Fetch the data from the cache first
+        key = f"game-series/{game_id}:{page}"
+        response = await cache.get(key)
+
+        # Parsed the data if found in cache else retrieve the data from API
+        # And set it into cache
+        if response:
+            response = json.loads(response)
+        else:
+            response = await client.get(f"/games/{game_id}/game-series", params={"page": page})
+            response.raise_for_status()
+            response = response.json()
+
+            await cache.set(key, json.dumps(response), ex=CACHE_EXP)
 
         return GameListResponse(
             count=response["count"],
@@ -374,12 +441,24 @@ async def get_video_game_screenshots(
         page: An integer representing the page number that needs to be fetched from the service.
     """
 
-    client: AsyncClient = ctx.request_context.lifespan_context
+    client: AsyncClient = ctx.request_context.lifespan_context["client"]
+    cache: redis.Redis = ctx.request_context.lifespan_context["cache"]
 
     try:
-        response = await client.get(f"/games/{game_id}/screenshots", params={"page": page})
-        response.raise_for_status()
-        response = response.json()
+        # Fetch the data from the cache first
+        key = f"screenshots/{game_id}:{page}"
+        response = await cache.get(key)
+
+        # Parsed the data if found in cache else retrieve the data from API
+        # And set it into cache
+        if response:
+            response = json.loads(response)
+        else:
+            response = await client.get(f"/games/{game_id}/screenshots", params={"page": page})
+            response.raise_for_status()
+            response = response.json()
+
+            await cache.set(key, json.dumps(response), ex=CACHE_EXP)
 
         return GameScreenshotListResponse(
             count=response["count"],
@@ -414,12 +493,24 @@ async def get_video_game_trailers(
         page: An integer representing the page number that needs to be fetched from the service.
     """
 
-    client: AsyncClient = ctx.request_context.lifespan_context
+    client: AsyncClient = ctx.request_context.lifespan_context["client"]
+    cache: redis.Redis = ctx.request_context.lifespan_context["cache"]
 
     try:
-        response = await client.get(f"/games/{game_id}/movies", params={"page": page})
-        response.raise_for_status()
-        response = response.json()
+        # Fetch the data from the cache first
+        key = f"movies/{game_id}:{page}"
+        response = await cache.get(key)
+
+        # Parsed the data if found in cache else retrieve the data from API
+        # And set it into cache
+        if response:
+            response = json.loads(response)
+        else:
+            response = await client.get(f"/games/{game_id}/movies", params={"page": page})
+            response.raise_for_status()
+            response = response.json()
+
+            await cache.set(key, json.dumps(response), ex=CACHE_EXP)
 
         return GameTrailerListResponse(
             count=response["count"],
@@ -448,12 +539,24 @@ async def get_video_game_details(ctx: Context, game_id: int) -> GameDetailRespon
         game_id: An integer containing the ID of a game.
     """
 
-    client: AsyncClient = ctx.request_context.lifespan_context
+    client: AsyncClient = ctx.request_context.lifespan_context["client"]
+    cache: redis.Redis = ctx.request_context.lifespan_context["cache"]
 
     try:
-        response = await client.get(f"/games/{game_id}")
-        response.raise_for_status()
-        response = response.json()
+        # Fetch the data from the cache first
+        key = f"games/{game_id}"
+        response = await cache.get(key)
+
+        # Parsed the data if found in cache else retrieve the data from API
+        # And set it into cache
+        if response:
+            response = json.loads(response)
+        else:
+            response = await client.get(f"/games/{game_id}")
+            response.raise_for_status()
+            response = response.json()
+
+            await cache.set(key, json.dumps(response), ex=CACHE_EXP)
 
         return GameDetailResponse(
             id=response["id"],
