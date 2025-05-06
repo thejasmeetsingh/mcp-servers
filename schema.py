@@ -37,13 +37,11 @@ class GameResponse(BaseModel):
     name: str
     released: str
     rating: int | float
-    rating_top: int
-    ratings_count: int
-    ratings: list[dict[str, Any]]
-    metacritic: int | None = None
     playtime: int
-    esrb_rating: dict[str, int | str] | None = None
-    platforms: list[dict[str, int | str]]
+    platforms: str
+    genres: str | None = None
+    esrb_rating: str | None = None
+    metacritic: int | None = None
 
 
 class GameListResponse(ListBaseResponse):
@@ -77,4 +75,4 @@ class GameDetailResponse(GameResponse):
     metacritic_platforms: list[dict[str, Any]]
     website: HttpUrl
     alternative_names: list[str]
-    metacritic_url: HttpUrl
+    platforms: list[dict[str, Any]]

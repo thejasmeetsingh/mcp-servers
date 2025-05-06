@@ -212,7 +212,7 @@ async def get_video_games_list(
     client: AsyncClient = ctx.request_context.lifespan_context
 
     try:
-        params = {"page": page, "exclude_stores": True, }
+        params = {"page": page, "exclude_stores": True}
 
         # Update the query params based on if they actually contain some value.
         if search:
@@ -242,19 +242,18 @@ async def get_video_games_list(
                     name=item["name"],
                     released=item["released"],
                     rating=item["rating"],
-                    rating_top=item["rating_top"],
-                    ratings_count=item["ratings_count"],
-                    ratings=item.get("ratings", []),
-                    metacritic=item.get("metacritic"),
                     playtime=item["playtime"],
-                    esrb_rating=item.get("esrb_rating"),
-                    platforms=[
-                        {
-                            "id": platform["platform"]["id"],
-                            "name": platform["platform"]["name"]
-                        }
+                    metacritic=item.get("metacritic"),
+                    esrb_rating=item["esrb_rating"]["name"] if item.get(
+                        "esrb_rating") else None,
+                    genres=",".join(
+                        genre["name"]
+                        for genre in response.get("genres", [])
+                    ),
+                    platforms=",".join(
+                        platform["platform"]["name"]
                         for platform in item.get("platforms", [])
-                    ]
+                    ),
                 )
                 for item in response.get("results", [])
             ]
@@ -292,19 +291,18 @@ async def get_video_game_additions(ctx: Context, game_id: int, page: int = 1) ->
                     name=item["name"],
                     released=item["released"],
                     rating=item["rating"],
-                    rating_top=item["rating_top"],
-                    ratings_count=item["ratings_count"],
-                    ratings=item.get("ratings", []),
-                    metacritic=item.get("metacritic"),
                     playtime=item["playtime"],
-                    esrb_rating=item.get("esrb_rating"),
-                    platforms=[
-                        {
-                            "id": platform["platform"]["id"],
-                            "name": platform["platform"]["name"]
-                        }
+                    metacritic=item.get("metacritic"),
+                    esrb_rating=item["esrb_rating"]["name"] if item.get(
+                        "esrb_rating") else None,
+                    genres=",".join(
+                        genre["name"]
+                        for genre in response.get("genres", [])
+                    ),
+                    platforms=",".join(
+                        platform["platform"]["name"]
                         for platform in item.get("platforms", [])
-                    ]
+                    ),
                 )
                 for item in response.get("results", [])
             ]
@@ -341,19 +339,18 @@ async def get_video_game_series(ctx: Context, game_id: int, page: int = 1) -> Ga
                     name=item["name"],
                     released=item["released"],
                     rating=item["rating"],
-                    rating_top=item["rating_top"],
-                    ratings_count=item["ratings_count"],
-                    ratings=item.get("ratings", []),
-                    metacritic=item.get("metacritic"),
                     playtime=item["playtime"],
-                    esrb_rating=item.get("esrb_rating"),
-                    platforms=[
-                        {
-                            "id": platform["platform"]["id"],
-                            "name": platform["platform"]["name"]
-                        }
+                    metacritic=item.get("metacritic"),
+                    esrb_rating=item["esrb_rating"]["name"] if item.get(
+                        "esrb_rating") else None,
+                    genres=",".join(
+                        genre["name"]
+                        for genre in response.get("genres", [])
+                    ),
+                    platforms=",".join(
+                        platform["platform"]["name"]
                         for platform in item.get("platforms", [])
-                    ]
+                    ),
                 )
                 for item in response.get("results", [])
             ]
@@ -462,19 +459,30 @@ async def get_video_game_details(ctx: Context, game_id: int) -> GameDetailRespon
             id=response["id"],
             name=response["name"],
             name_original=response["name_original"],
+            alternative_names=response.get("alternative_names", []),
             description=response["description"],
             metacritic=response.get("metacritic"),
-            metacritic_platforms=response.get("metacritic_platforms", []),
+            metacritic_platforms=[
+                {
+                    "metascore": metacritic_platform["metascore"],
+                    "platform": metacritic_platform["platform"]["name"]
+                }
+                for metacritic_platform in response.get("metacritic_platforms", [])
+            ],
             released=response["released"],
             website=response["website"],
             rating=response["rating"],
-            rating_top=response["rating_top"],
-            ratings=response.get("ratings", []),
             playtime=response["playtime"],
-            ratings_count=response["ratings_count"],
-            metacritic_url=response["metacritic_url"],
-            esrb_rating=response.get("esrb_rating"),
-            platforms=response.get("platforms", [])
+            esrb_rating=response["esrb_rating"]["name"] if response.get(
+                "esrb_rating") else None,
+            platforms=[
+                {
+                    "name": platform["platform"]["name"],
+                    "released_at": platform["released_at"],
+                    "requirements": platform["requirements"]
+                }
+                for platform in response.get("platforms", [])
+            ]
         )
     except Exception as e:
         raise ValueError(
