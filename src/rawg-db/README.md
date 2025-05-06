@@ -18,7 +18,7 @@ This tool allows you to query comprehensive video game information directly thro
 
     First, establish a shared Docker network and deploy a Redis container for caching:
 
-    **Note:** Redis is being as cache to store reduntant API responses which do not change often and it significantly reduse our API calls to the rawg service. Thus the changes of getting throttling errors from the service are very less.
+    **Note:** Redis is being as cache to store redundant API responses which do not change often and it significantly reduce our API calls to the rawg service. Thus the changes of getting throttling errors from the service are very less.
 
     ```bash
      # Create a shared Docker network
@@ -72,24 +72,20 @@ This tool allows you to query comprehensive video game information directly thro
 
     Once configured, you can ask Claude questions about video games, such as:
 
-        - "What are the top-rated games of 2023?"
-        - "Tell me about the developer of Elden Ring"
-        - "What platforms is Cyberpunk 2077 available on?"
+    - "What are the top-rated games of 2023?"
+    - "Tell me about the developer of Elden Ring"
+    - "What platforms is Cyberpunk 2077 available on?"
 
-## Demo
-
-    Watch the tool in action:
-
-    <video controls src="https://ja3-projects.s3.ap-south-1.amazonaws.com/rawg-db-mcp.mp4" title="Title"></video>
+<video controls src="https://ja3-projects.s3.ap-south-1.amazonaws.com/rawg-db-mcp.mp4" title="demo"></video>
 
 ## Troubleshooting
 
-    If you encounter issues:
+If you encounter issues:
 
-    - Verify Docker is running
-    - Confirm Redis container is active with `docker container ls`
-    - Check API key validity
-    - Inspect Docker logs with docker logs `rawg-db`
+- Verify Docker is running
+- Confirm Redis container is active with `docker container ls`
+- Check API key validity
+- Inspect Docker logs with docker logs `rawg-db`
 
 <hr>
 *For more information about Claude's MCP capabilities, please refer to the official documentation.*
