@@ -10,8 +10,6 @@ from dotenv import load_dotenv
 from schema import (
     GenreResponse,
     GenreListResponse,
-    PlatformResponse,
-    PlatformListResponse,
     GameResponse,
     GameListResponse,
     GameScreenshotResponse,
@@ -20,6 +18,7 @@ from schema import (
     GameTrailerListResponse,
     GameDetailResponse
 )
+from utils import convert_dict_to_markdown
 
 
 # Load env variables located in .env file
@@ -27,7 +26,7 @@ load_dotenv()
 BASE_URL = os.getenv("RAWG_API_BASE_URL")
 API_KEY = os.getenv("RAWG_API_KEY")
 
-RAWG_RESULT_PAGE_SIZE = 5
+RAWG_RESULT_PAGE_SIZE = 10
 CACHE_EXP = 3600
 
 
@@ -75,7 +74,7 @@ mcp = FastMCP(name="rawg-db", lifespan=lifespan)
 
 
 @mcp.tool()
-async def get_video_games_genre_list(ctx: Context, page: int = 1) -> GenreListResponse:
+async def get_video_games_genre_list(ctx: Context, page: int = 1) -> str:
     """
     Get list of video game genres. Like: Action, Adventure, Indie etc
 
@@ -104,7 +103,7 @@ async def get_video_games_genre_list(ctx: Context, page: int = 1) -> GenreListRe
 
         await ctx.report_progress(75, 100)
 
-        return GenreListResponse(
+        result = GenreListResponse(
             count=response["count"],
             current_page=page,
             page_size=RAWG_RESULT_PAGE_SIZE,
@@ -116,97 +115,13 @@ async def get_video_games_genre_list(ctx: Context, page: int = 1) -> GenreListRe
                 )
                 for item in response.get("results", [])
             ]
-        )
+        ).model_dump()
+
+        return convert_dict_to_markdown(result)
+
     except Exception as e:
         raise ValueError(
             f"Error caught while fetching the genre list: {str(e)}") from e
-
-
-@mcp.tool()
-async def get_video_game_genre_detail(ctx: Context, genre_id: int) -> GenreResponse:
-    """
-    Get detail of a video game genres, Like its name, description and related image
-
-    Args:
-        genre_id: An integer representing the genre ID
-    """
-
-    client: AsyncClient = ctx.request_context.lifespan_context["client"]
-    cache: redis.Redis = ctx.request_context.lifespan_context["cache"]
-
-    try:
-        # Fetch the data from the cache first
-        key = f"genres/{genre_id}"
-        response = await cache.get(key)
-
-        # Parsed the data if found in cache else retrieve the data from API
-        # And set it into cache
-        if response:
-            response = json.loads(response)
-        else:
-            response = await client.get(f"/genres/{genre_id}")
-            response.raise_for_status()
-            response = response.json()
-
-            await cache.set(key, json.dumps(response), ex=CACHE_EXP)
-
-        return GenreResponse(
-            id=response["id"],
-            name=response["name"],
-            games_count=response["games_count"],
-            description=response["description"],
-        )
-    except Exception as e:
-        raise ValueError(
-            f"Error caught while fetching the genre detail: {str(e)}") from e
-
-
-@mcp.tool()
-async def get_video_game_platforms(ctx: Context, page: int = 1) -> PlatformListResponse:
-    """
-    Get list of a video game platforms, Like: PS4, PS2, Xbox, PC etc.
-
-    Args:
-        page: An integer representing the page number that needs to be fetched from the service.
-    """
-
-    client: AsyncClient = ctx.request_context.lifespan_context["client"]
-    cache: redis.Redis = ctx.request_context.lifespan_context["cache"]
-
-    try:
-        # Fetch the data from the cache first
-        key = f"platforms:{page}"
-        response = await cache.get(key)
-
-        # Parsed the data if found in cache else retrieve the data from API
-        # And set it into cache
-        if response:
-            response = json.loads(response)
-        else:
-            response = await client.get("/platforms", params={"page": page})
-            response.raise_for_status()
-            response = response.json()
-
-            await cache.set(key, json.dumps(response), ex=CACHE_EXP)
-
-        return PlatformListResponse(
-            count=response["count"],
-            current_page=page,
-            page_size=RAWG_RESULT_PAGE_SIZE,
-            results=[
-                PlatformResponse(
-                    id=item["id"],
-                    name=item["name"],
-                    games_count=item["games_count"],
-                    year_start=item.get("year_start"),
-                    year_end=item.get("year_end")
-                )
-                for item in response.get("results", [])
-            ]
-        )
-    except Exception as e:
-        raise ValueError(
-            f"Error caught while fetching the platform list: {str(e)}") from e
 
 
 @mcp.tool()
@@ -214,12 +129,11 @@ async def get_video_games_list(
     ctx: Context,
     page: int = 1,
     search: str | None = None,
-    platforms: str | None = None,
     genres: str | None = None,
     dates: str | None = None,
     metacritic: str | None = None,
     ordering: str | None = None
-) -> GameListResponse:
+) -> str:
     """
     Get list of a video games.
 
@@ -227,12 +141,9 @@ async def get_video_games_list(
         page: An integer representing the page number that needs to be fetched from the service.
         search: An optional string which contains the search query.
 
-        platforms: An optional comma-separated string,
-                    To perform filter on the games list by platform IDs. Like: 4,5 or 5.
-
         genres: An optional comma-separated string,
                 To perform filter on the games list by genre IDs or names.
-                Like: 1,2 or 4 or action or action,indie.
+                Like: action or action,indie.
 
         dates: An optional comma-separated string,
                 To perform filter on the games list by release date.
@@ -260,8 +171,6 @@ async def get_video_games_list(
         # Update the query params based on if they actually contain some value.
         if search:
             params.update({"search": search})
-        if platforms:
-            params.update({"platforms": platforms})
         if genres:
             params.update({"genres": genres})
         if dates:
@@ -275,7 +184,7 @@ async def get_video_games_list(
         response.raise_for_status()
         response = response.json()
 
-        return GameListResponse(
+        result = GameListResponse(
             count=response["count"],
             current_page=page,
             page_size=RAWG_RESULT_PAGE_SIZE,
@@ -300,14 +209,17 @@ async def get_video_games_list(
                 )
                 for item in response.get("results", [])
             ]
-        )
+        ).model_dump()
+
+        return convert_dict_to_markdown(result)
+
     except Exception as e:
         raise ValueError(
             f"Error caught while fetching the games list: {str(e)}") from e
 
 
 @mcp.tool()
-async def get_video_game_additions(ctx: Context, game_id: int, page: int = 1) -> GameListResponse:
+async def get_video_game_additions(ctx: Context, game_id: int, page: int = 1) -> str:
     """
     Get a list of additions or DLC's for the given game ID, GOTY and other editions,
     companion apps, etc.
@@ -336,7 +248,7 @@ async def get_video_game_additions(ctx: Context, game_id: int, page: int = 1) ->
 
             await cache.set(key, json.dumps(response), ex=CACHE_EXP)
 
-        return GameListResponse(
+        result = GameListResponse(
             count=response["count"],
             current_page=page,
             page_size=RAWG_RESULT_PAGE_SIZE,
@@ -361,70 +273,13 @@ async def get_video_game_additions(ctx: Context, game_id: int, page: int = 1) ->
                 )
                 for item in response.get("results", [])
             ]
-        )
+        ).model_dump()
+
+        return convert_dict_to_markdown(result)
+
     except Exception as e:
         raise ValueError(
             f"Error caught while fetching the additions of a game: {str(e)}") from e
-
-
-@mcp.tool()
-async def get_video_game_series(ctx: Context, game_id: int, page: int = 1) -> GameListResponse:
-    """
-    Get a list of games that are part of the same series based on the given game ID.
-
-    Args:
-        game_id: An integer containing the ID of a game.
-        page: An integer representing the page number that needs to be fetched from the service.
-    """
-
-    client: AsyncClient = ctx.request_context.lifespan_context["client"]
-    cache: redis.Redis = ctx.request_context.lifespan_context["cache"]
-
-    try:
-        # Fetch the data from the cache first
-        key = f"game-series/{game_id}:{page}"
-        response = await cache.get(key)
-
-        # Parsed the data if found in cache else retrieve the data from API
-        # And set it into cache
-        if response:
-            response = json.loads(response)
-        else:
-            response = await client.get(f"/games/{game_id}/game-series", params={"page": page})
-            response.raise_for_status()
-            response = response.json()
-
-            await cache.set(key, json.dumps(response), ex=CACHE_EXP)
-
-        return GameListResponse(
-            count=response["count"],
-            current_page=page,
-            page_size=RAWG_RESULT_PAGE_SIZE,
-            results=[
-                GameResponse(
-                    id=item["id"],
-                    name=item["name"],
-                    released=item["released"],
-                    rating=item["rating"],
-                    playtime=item["playtime"],
-                    metacritic=item.get("metacritic"),
-                    esrb_rating=item["esrb_rating"]["name"] if item.get(
-                        "esrb_rating") else None,
-                    genres=",".join(
-                        genre["name"]
-                        for genre in response.get("genres", [])
-                    ),
-                    platforms=",".join(
-                        platform["platform"]["name"]
-                        for platform in item.get("platforms", [])
-                    ),
-                )
-                for item in response.get("results", [])
-            ]
-        )
-    except Exception as e:
-        raise ValueError(
-            f"Error caught while fetching the series of a game: {str(e)}") from e
 
 
 @mcp.tool()
@@ -432,7 +287,7 @@ async def get_video_game_screenshots(
     ctx: Context,
     game_id: int,
     page: int = 1
-) -> GameScreenshotListResponse:
+) -> str:
     """
     Get screenshots or images for the given game ID.
 
@@ -460,7 +315,7 @@ async def get_video_game_screenshots(
 
             await cache.set(key, json.dumps(response), ex=CACHE_EXP)
 
-        return GameScreenshotListResponse(
+        result = GameScreenshotListResponse(
             count=response["count"],
             current_page=page,
             page_size=RAWG_RESULT_PAGE_SIZE,
@@ -473,7 +328,10 @@ async def get_video_game_screenshots(
                 )
                 for item in response.get("results", [])
             ]
-        )
+        ).model_dump()
+
+        return convert_dict_to_markdown(result)
+
     except Exception as e:
         raise ValueError(
             f"Error caught while fetching the screenshots of a game: {str(e)}") from e
@@ -484,7 +342,7 @@ async def get_video_game_trailers(
     ctx: Context,
     game_id: int,
     page: int = 1
-) -> GameTrailerListResponse:
+) -> str:
     """
     Get a list of trailers/movies/gameplay etc of a given game ID.
 
@@ -512,7 +370,7 @@ async def get_video_game_trailers(
 
             await cache.set(key, json.dumps(response), ex=CACHE_EXP)
 
-        return GameTrailerListResponse(
+        result = GameTrailerListResponse(
             count=response["count"],
             current_page=page,
             page_size=RAWG_RESULT_PAGE_SIZE,
@@ -524,14 +382,17 @@ async def get_video_game_trailers(
                 )
                 for item in response.get("results", [])
             ]
-        )
+        ).model_dump()
+
+        return convert_dict_to_markdown(result)
+
     except Exception as e:
         raise ValueError(
             f"Error caught while fetching the trailers of a game: {str(e)}") from e
 
 
 @mcp.tool()
-async def get_video_game_details(ctx: Context, game_id: int) -> GameDetailResponse:
+async def get_video_game_details(ctx: Context, game_id: int) -> str:
     """
     Get details of the game.
 
@@ -558,7 +419,7 @@ async def get_video_game_details(ctx: Context, game_id: int) -> GameDetailRespon
 
             await cache.set(key, json.dumps(response), ex=CACHE_EXP)
 
-        return GameDetailResponse(
+        result = GameDetailResponse(
             id=response["id"],
             name=response["name"],
             name_original=response["name_original"],
@@ -586,7 +447,10 @@ async def get_video_game_details(ctx: Context, game_id: int) -> GameDetailRespon
                 }
                 for platform in response.get("platforms", [])
             ]
-        )
+        ).model_dump()
+
+        return convert_dict_to_markdown(result)
+
     except Exception as e:
         raise ValueError(
             f"Error caught while fetching the details of a game: {str(e)}") from e

@@ -1,6 +1,6 @@
 from typing import Any
 
-from pydantic import BaseModel, HttpUrl
+from pydantic import BaseModel
 
 
 class ListBaseResponse(BaseModel):
@@ -18,18 +18,6 @@ class GenreResponse(BaseModel):
 
 class GenreListResponse(ListBaseResponse):
     results: list[GenreResponse]
-
-
-class PlatformResponse(BaseModel):
-    id: int
-    name: str
-    games_count: int
-    year_start: int | None = None
-    year_end: int | None = None
-
-
-class PlatformListResponse(ListBaseResponse):
-    results: list[PlatformResponse]
 
 
 class GameResponse(BaseModel):
@@ -50,7 +38,7 @@ class GameListResponse(ListBaseResponse):
 
 class GameScreenshotResponse(BaseModel):
     id: int
-    image: HttpUrl
+    image: str
     width: int
     height: int
 
@@ -62,7 +50,7 @@ class GameScreenshotListResponse(ListBaseResponse):
 class GameTrailerResponse(BaseModel):
     id: int
     name: str
-    trailer: HttpUrl
+    trailer: str
 
 
 class GameTrailerListResponse(ListBaseResponse):
@@ -73,6 +61,6 @@ class GameDetailResponse(GameResponse):
     name_original: str
     description: str
     metacritic_platforms: list[dict[str, Any]]
-    website: HttpUrl | None
+    website: str | None
     alternative_names: list[str]
     platforms: list[dict[str, Any]]
