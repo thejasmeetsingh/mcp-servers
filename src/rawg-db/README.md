@@ -78,7 +78,6 @@ This tool allows you to query comprehensive video game information directly thro
 
 [![](https://github.com/user-attachments/assets/5d2a15f9-cb45-42f8-9f59-a017127ddda0)](https://ja3-projects.s3.ap-south-1.amazonaws.com/rawg-db-mcp.mp4)
 
-
 ## Troubleshooting
 
 If you encounter issues:
@@ -90,4 +89,4 @@ If you encounter issues:
 
 ---
 
-_For more information about Claude's MCP capabilities, please refer to the official documentation_
+_For more information about Claude's MCP capabilities, please refer to the [official documentation](https://modelcontextprotocol.io/introduction)_
