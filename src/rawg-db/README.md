@@ -28,6 +28,14 @@ This tool allows you to query comprehensive video game information directly thro
      docker run -d --name redis --network shared-network redis:alpine
     ```
 
+    Second, Build from source:
+
+    ```bash
+    git clone https://github.com/thejasmeetsingh/mcp-servers.git
+    cd src/rawg-db/
+    docker build -t mcp/rawg-db .
+    ```
+
 2.  Configure Claude Desktop
     Locate and modify your `claude_desktop_config.json` file:
 

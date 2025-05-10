@@ -18,7 +18,15 @@ A Model Context Protocol (MCP) server implementation that empowers Large Languag
 
 ## Setup Instructions
 
-1. Configure Claude Desktop
+1. Build from source:
+
+   ```bash
+   git clone https://github.com/thejasmeetsingh/mcp-servers.git
+   cd src/web-search/
+   docker build -t mcp/web-search .
+   ```
+
+2. Configure Claude Desktop
    Locate and modify your `claude_desktop_config.json` file:
 
    **File Location:**
@@ -53,7 +61,7 @@ A Model Context Protocol (MCP) server implementation that empowers Large Languag
 
    > **Important**: Replace `<Brave API KEY>` and `<TAVILY API KEY>` with your actual API keys.
 
-2. Restart Claude
+3. Restart Claude
    After saving your configuration, restart the Claude Desktop application to apply the changes.
 
    **Usage**
