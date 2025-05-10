@@ -51,7 +51,7 @@ A Model Context Protocol (MCP) server implementation that empowers Large Languag
    }
    ```
 
-   > **Important**: Replace `your_brave_api_key_here` and `your_tavily_api_key_here` with your actual API keys.
+   > **Important**: Replace `<Brave API KEY>` and `<TAVILY API KEY>` with your actual API keys.
 
 2. Restart Claude
    After saving your configuration, restart the Claude Desktop application to apply the changes.
@@ -66,7 +66,7 @@ A Model Context Protocol (MCP) server implementation that empowers Large Languag
    - "Research quantum computing advancements"
    - "Search for healthy dinner recipes"
 
-[![](https://github.com/user-attachments/assets/5d2a15f9-cb45-42f8-9f59-a017127ddda0)]()
+[![](https://github.com/user-attachments/assets/5d2a15f9-cb45-42f8-9f59-a017127ddda0)](https://ja3-projects.s3.ap-south-1.amazonaws.com/web-search-mcp.mp4)
 
 ## Troubleshooting
 
