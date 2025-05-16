@@ -81,7 +81,6 @@ A Model Context Protocol (MCP) server implementation that empowers Large Languag
 If you encounter issues:
 
 - Verify Docker is running
-- Confirm Redis container is active with `docker container ls`
 - Check API key validity
 - Inspect Docker logs with docker logs `web-search`
 - Confirm the JSON syntax in your config file is correct
