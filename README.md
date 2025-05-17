@@ -2,4 +2,4 @@
 
 1. [RAWG Video Games Database](./src/rawg-db/)
 2. [Web Search](./src/web-search/)
-3. [Calendar](./src/calendar/)
+3. [Google Calendar](./src/calendar/)
