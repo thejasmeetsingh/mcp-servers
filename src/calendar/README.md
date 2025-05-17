@@ -74,7 +74,7 @@ Once configured, interact with your Google Calendar using natural language:
 - **Delete Event**: "Please cancel my meeting with the marketing team tomorrow."
 - **Get Details**: "What's on my calendar for May 20th?"
 
-[![](https://github.com/user-attachments/assets/5d2a15f9-cb45-42f8-9f59-a017127ddda0)](https://ja3-projects.s3.ap-south-1.amazonaws.com/web-search-mcp.mp4)
+[![](https://github.com/user-attachments/assets/5d2a15f9-cb45-42f8-9f59-a017127ddda0)]()
 
 ## Troubleshooting
 
