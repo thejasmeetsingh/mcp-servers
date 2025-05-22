@@ -1,0 +1,13 @@
+*.log
+*.pot
+*.pyc
+.git/
+__pycache__/
+venv/
+.vscode/
+.idea/
+static/
+.env
+.gitignore
+Dockerfile
+.dockerignore
