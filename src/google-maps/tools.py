@@ -1,7 +1,6 @@
 import os
 import logging
 from enum import Enum
-from dataclasses import dataclass
 from typing import Any, Dict, List, Optional
 
 from dotenv import load_dotenv
@@ -72,25 +71,6 @@ class RankPreference(Enum):
 
     RELEVANCE = "RELEVANCE"
     DISTANCE = "DISTANCE"
-
-
-@dataclass
-class Location:
-    """Data class representing geographical coordinates."""
-
-    latitude: float
-    longitude: float
-
-    def to_dict(self) -> Dict[str, float]:
-        """Convert location to dictionary format."""
-
-        return {"latitude": self.latitude, "longitude": self.longitude}
-
-    @classmethod
-    def from_dict(cls, data: Dict[str, float]) -> 'Location':
-        """Create Location instance from dictionary."""
-
-        return cls(latitude=data["latitude"], longitude=data["longitude"])
 
 
 class GoogleMapsAPIError(Exception):
@@ -246,9 +226,7 @@ def get_places_headers() -> Dict[str, str]:
         "places.googleMapsUri",
         "places.businessStatus",
         "places.displayName",
-        "places.websiteUri",
-        "places.priceLevel",
-        "places.userRatingCount"
+        "places.websiteUri"
     ]
 
     return {
@@ -274,7 +252,6 @@ def get_routes_headers() -> Dict[str, str]:
         "routes.legs.steps.staticDuration",
         "routes.legs.steps.navigationInstruction",
         "routes.legs.steps.travelMode",
-        "routes.polyline"
     ]
 
     return {
@@ -362,7 +339,7 @@ async def search_places(
 
     Args:
         query: Search term or query string
-        location: Geographic coordinates as a dictionary
+        location: Geographic coordinates as a dictionary. For e.g: {"latitude": 40.7127753, "longitude": -74.0059728}
         radius: Search radius in meters (0.0 to 50,000.0)
         order_by: Result ranking preference ("RELEVANCE" or "DISTANCE")
 
@@ -426,8 +403,8 @@ async def get_route(
     Args:
         source: Starting location address or plus code
         destination: Ending location address or plus code
-        travel_mode: Transportation method
-        transit_travel_mode: Public transit preference
+        travel_mode: Transportation method ("DRIVE", "BICYCLE", "WALK", "TWO_WHEELER" or "TRANSIT")
+        transit_travel_mode: Public transit preference ("BUS" or "RAIL")
 
     Returns:
         Markdown-formatted string containing route information
@@ -490,7 +467,7 @@ async def get_weather_forecast(
     Retrieve detailed weather forecast for a specific location.
 
     Args:
-        location: Geographic coordinates
+        location: Geographic coordinates. For e.g: {"latitude": 40.7127753, "longitude": -74.0059728}
         days: Number of forecast days (1-14)
 
     Returns:
@@ -550,8 +527,8 @@ async def get_air_quality_forecast(
     Retrieve air quality forecast and health recommendations.
 
     Args:
-        location: Geographic coordinates
-        interval: Time range for forecast
+        location: Geographic coordinates. For e.g: {"latitude": 40.7127753, "longitude": -74.0059728}
+        interval: Time range for forecast. For e.g: {"startTime": "2025-05-23T19:00:00+05:30", "endTime": "2025-05-23T21:00:00+05:30"}
         page_token: Pagination token for additional results
 
     Returns:
