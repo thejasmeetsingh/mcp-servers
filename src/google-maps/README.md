@@ -158,6 +158,8 @@ Once configured, try these natural language queries:
 - "Find outdoor restaurants in Miami and check if the weather is good for dining outside tonight"
 - "Plan a route to Central Park and let me know if the air quality is safe for jogging"
 
+[![](https://github.com/user-attachments/assets/5d2a15f9-cb45-42f8-9f59-a017127ddda0)](https://ja3-projects.s3.ap-south-1.amazonaws.com/google-maps-mcp.mp4)
+
 ## 🛠️ Troubleshooting
 
 ### Common Issues and Solutions
