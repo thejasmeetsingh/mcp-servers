@@ -10,3 +10,6 @@ class S3Manager:
             aws_access_key_id=access_key,
             aws_secret_access_key=secret_key
         )
+
+    def get_buckets(self) -> List[Dict[str, Any]]:
+        response = self.client.list_buckets()
