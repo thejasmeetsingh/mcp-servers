@@ -1,3 +1,7 @@
+import os
+import datetime
+
+
 def get_prefix(nested_level: int) -> str:
     return "\t" * nested_level
 
@@ -80,3 +84,54 @@ def convert_dict_to_markdown(dataset: dict, nested_count: int = 0, skippable_ite
         raise e
 
     return result
+
+
+def format_bucket_data(buckets: list) -> list:
+    """
+    Format bucket data for consistent output.
+
+    Args:
+        buckets: List of bucket dictionaries from AWS response
+
+    Returns:
+        list: Formatted bucket data with name and creation date
+    """
+
+    return [{
+        "name": bucket["Name"],
+        "created_at": bucket["CreationDate"].isoformat()
+    } for bucket in buckets]
+
+
+def format_object_data(objects: list) -> list:
+    """
+    Format object data for consistent output.
+
+    Args:
+        objects: List of object dictionaries from AWS response
+
+    Returns:
+        list: Formatted object data with key, modification date, and size
+    """
+
+    return [{
+        "key": obj["Key"],
+        "modified_at": obj["LastModified"].isoformat(),
+        "size_bytes": obj["Size"]
+    } for obj in objects]
+
+
+def generate_unique_key(file_path: str) -> str:
+    """
+    Generate a unique S3 key for a file by appending timestamp.
+
+    Args:
+        file_path: Path to the file
+
+    Returns:
+        str: Unique S3 key with timestamp
+    """
+
+    filename, ext = os.path.splitext(os.path.basename(file_path))
+    timestamp = round(datetime.datetime.now().timestamp())
+    return f"{filename}-{timestamp}{ext}"
