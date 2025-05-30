@@ -394,9 +394,7 @@ async def download_file(ctx: Context, bucket: str, key: str) -> str:
         with open(file_path, "wb") as file_handle:
             client.download_fileobj(bucket, key, file_handle)
 
-        success_msg = (
-            f"File '{key}' downloaded successfully from bucket '{bucket}' to '{file_path}'"
-        )
+        success_msg = f"File '{key}' downloaded successfully from bucket '{bucket}'."
         logger.info(success_msg)
         return success_msg
 
