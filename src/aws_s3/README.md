@@ -205,12 +205,6 @@ If you encounter issues not covered here:
 3. **Test AWS access**: Use AWS CLI to verify your credentials work independently
 4. **GitHub Issues**: Report bugs or request features on the [project repository](https://github.com/thejasmeetsingh/mcp-servers)
 
-## ⚡ Performance Tips
-
-- **Batch Operations**: Group multiple file operations when possible
-- **Local Storage**: Ensure adequate disk space in your configured local directory
-- **Network**: Stable internet connection required for reliable S3 operations
-
 ## 🔒 Security Best Practices
 
 - **Principle of Least Privilege**: Only grant necessary S3 permissions
