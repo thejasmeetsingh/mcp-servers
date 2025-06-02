@@ -100,8 +100,8 @@ Add this configuration to your `claude_desktop_config.json`:
 **Configuration Parameters:**
 
 - `DB_NAME`: Your PostgreSQL database name
-- `DB_USER`: Database username (default from docker-compose: `postgres`)
-- `DB_PASSWORD`: Database password (check your docker-compose.yml)
+- `DB_USER`: Database username (check your .env file)
+- `DB_PASSWORD`: Database password (check your .env file)
 - `DB_HOST`: Container hostname (use `db` for the docker-compose setup)
 - `DB_PORT`: PostgreSQL port (default: `5432`)
 
