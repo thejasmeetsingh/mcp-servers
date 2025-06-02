@@ -135,6 +135,10 @@ Once configured, you can interact with your PostgreSQL database through natural 
 - "Add an index on the email column for better performance"
 - "Show me the execution plan for this complex query"
 
+## 🎥 Demo
+
+[![](https://github.com/user-attachments/assets/5d2a15f9-cb45-42f8-9f59-a017127ddda0)](https://ja3-projects.s3.ap-south-1.amazonaws.com/postgresql-mcp-1748885939.mp4)
+
 ## 🔧 Troubleshooting
 
 **Connection Issues:**
