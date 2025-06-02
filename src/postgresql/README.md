@@ -14,7 +14,6 @@ A Model Context Protocol (MCP) server that enables your favorite LLM to seamless
 
 - Syntax validation before execution
 - Natural language to SQL translation
-- Detailed error reporting and debugging assistance
 - Query optimization suggestions
 
 **Safety & Security**
@@ -100,8 +99,8 @@ Add this configuration to your `claude_desktop_config.json`:
 **Configuration Parameters:**
 
 - `DB_NAME`: Your PostgreSQL database name
-- `DB_USER`: Database username (check your .env file)
-- `DB_PASSWORD`: Database password (check your .env file)
+- `DB_USER`: Database username (check your `.env` file)
+- `DB_PASSWORD`: Database password (check your `.env` file)
 - `DB_HOST`: Container hostname (use `db` for the docker-compose setup)
 - `DB_PORT`: PostgreSQL port (default: `5432`)
 
