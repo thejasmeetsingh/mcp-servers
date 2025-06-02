@@ -26,9 +26,9 @@ A Model Context Protocol (MCP) server that enables your favorite LLM to seamless
 
 Before getting started, ensure you have:
 
-- Docker and Docker Compose installed
-- Claude Desktop application
-- Basic familiarity with PostgreSQL (helpful but not required)
+- Docker and Docker Compose installed ([Download Docker](https://docs.docker.com/get-docker/))
+- Claude Desktop application ([Download Claude](https://claude.ai/download))
+- Basic familiarity with PostgreSQL - helpful but not required ([PostgreSQL in 100 seconds](https://www.youtube.com/watch?v=n2Fluyr3lbc))
 
 ## 🚀 Quick Start Guide
 
