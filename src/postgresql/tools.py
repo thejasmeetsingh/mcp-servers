@@ -124,9 +124,10 @@ async def execute_sql(ctx: Context, query: str) -> str:
             logger.info("SELECT query returned %d records", len(records))
             response = format_select_query_results(records)
         else:
-            result_msg = await conn.execute(query)
-            logger.info("Non-SELECT query executed: %s", result_msg)
-            response = f"Query executed successfully: {result_msg}"
+            async with conn.transaction():
+                result_msg = await conn.execute(query)
+                logger.info("Non-SELECT query executed: %s", result_msg)
+                response = f"Query executed successfully: {result_msg}"
 
         return response
 
