@@ -66,8 +66,6 @@ Create a custom IAM policy with the following JSON configuration. This provides 
 3. **Generate Access Keys** for programmatic access
 4. **Save the credentials** securely (you'll need them for configuration)
 
-> ⚠️ **Security Note**: Store your AWS credentials securely and never commit them to version control
-
 ## 🚀 Installation & Setup
 
 ### Step 1: Clone and Build
@@ -107,9 +105,9 @@ Add the following configuration to your `claude_desktop_config.json` file:
         "-v",
         "<YOUR_LOCAL_PATH>:/data",
         "-e",
-        "ACCESS_KEY_ID=<YOUR_AWS_ACCESS_KEY_ID>",
+        "AWS_ACCESS_KEY_ID=<YOUR_AWS_ACCESS_KEY_ID>",
         "-e",
-        "SECRET_ACCESS_KEY=<YOUR_AWS_SECRET_ACCESS_KEY>",
+        "AWS_SECRET_ACCESS_KEY=<YOUR_AWS_SECRET_ACCESS_KEY>",
         "--name",
         "aws-s3-mcp",
         "mcp/aws-s3"

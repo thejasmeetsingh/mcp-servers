@@ -6,3 +6,4 @@
 4. ### 📍 [Google Maps](./src/google-maps/)
 5. ### 🪣 [AWS S3](./src/aws_s3/)
 6. ### 🐘 [PostgreSQL](./src/postgresql/)
+7. ### 🗂️ [AWS CloudWatch Logs](./src/aws_cloudwatch)

@@ -23,8 +23,8 @@ logger = logging.getLogger(__name__)
 
 # Load environment variables
 load_dotenv()
-ACCESS_KEY_ID = os.getenv("ACCESS_KEY_ID")
-SECRET_ACCESS_KEY = os.getenv("SECRET_ACCESS_KEY")
+AWS_ACCESS_KEY_ID = os.getenv("AWS_ACCESS_KEY_ID")
+AWS_SECRET_ACCESS_KEY = os.getenv("AWS_SECRET_ACCESS_KEY")
 
 # Constants
 DATA_DIRECTORY = "/data"
@@ -103,16 +103,12 @@ async def lifespan(_: FastMCP):
         S3ClientError: If AWS credentials are missing or invalid
     """
 
-    if not ACCESS_KEY_ID or not SECRET_ACCESS_KEY:
+    if not AWS_ACCESS_KEY_ID or not AWS_SECRET_ACCESS_KEY:
         raise S3ClientError("AWS credentials are not configured")
 
     client = None
     try:
-        client = boto3.client(
-            "s3",
-            aws_access_key_id=ACCESS_KEY_ID,
-            aws_secret_access_key=SECRET_ACCESS_KEY
-        )
+        client = boto3.client("s3")
 
         # Test the connection by attempting to list buckets
         client.list_buckets()
