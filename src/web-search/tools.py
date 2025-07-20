@@ -19,11 +19,13 @@ MAX_REQUEST_TIMEOUT = 30  # In seconds
 mcp = FastMCP("web-search")
 
 
-@mcp.tool()
+@mcp.tool(
+    name="Web Search",
+    description="Perform a web search using Brave Search API",
+    annotations={"title": "Web Search", "readOnlyHint": True}
+)
 async def web_search(query: str, country: str = "IN") -> str:
     """
-    Perform a web search using Brave Search API.
-
     This function connects to the Brave Search API, executes the provided query,
     and returns formatted search results as markdown.
 
@@ -84,11 +86,13 @@ async def web_search(query: str, country: str = "IN") -> str:
             f"Error caught while perform a web search: {str(e)}") from e
 
 
-@mcp.tool()
+@mcp.tool(
+    name="Extract Web Page Content",
+    description="Extract web page content from URLs using Tavily Extract API.",
+    annotations={"title": "Extract Web Page Content", "readOnlyHint": True}
+)
 async def extract_web_page_content(urls: list[str]) -> str:
     """
-    Extract web page content from URLs using Tavily Extract API.
-
     This function processes one or more URLs, extracts their content using
     the Tavily Extract API, and returns the extracted content in markdown format.
 

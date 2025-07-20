@@ -1,6 +1,6 @@
 # FastAgent Configuration File
 
-default_model: generic.qwen3:4b
+default_model: generic.qwen3:latest
 execution_engine: "asyncio"
 
 # Ollama
