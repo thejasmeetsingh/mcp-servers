@@ -43,7 +43,11 @@ async def lifespan(_: FastMCP):
 mcp = FastMCP("calendar", lifespan=lifespan)
 
 
-@mcp.tool()
+@mcp.tool(
+    name="Get Events",
+    title="Get Calendar Events",
+    annotations={"readOnlyHint": True}
+)
 def get_events(ctx: Context, max_results: int = 10) -> str:
     """
     Retrieve upcoming events from the user's calendar.
@@ -66,7 +70,11 @@ def get_events(ctx: Context, max_results: int = 10) -> str:
             f"Error caught while fetching events from calendar: {str(e)}") from e
 
 
-@mcp.tool()
+@mcp.tool(
+    name="Search Event",
+    title="Search Calendar Events",
+    annotations={"readOnlyHint": True}
+)
 def search_event(ctx: Context, query: str, max_results: int = 10) -> str:
     """
     Search for events matching a specific query in the calendar.
@@ -90,7 +98,11 @@ def search_event(ctx: Context, query: str, max_results: int = 10) -> str:
             f"Error caught while searching an event: {str(e)}") from e
 
 
-@mcp.tool()
+@mcp.tool(
+    name="Add Event",
+    title="Add a Calendar Event",
+    annotations={"readOnlyHint": True}
+)
 def add_event(
     ctx: Context,
     summary: str,
@@ -136,7 +148,11 @@ def add_event(
             f"Error caught while adding an event: {str(e)}") from e
 
 
-@mcp.tool()
+@mcp.tool(
+    name="Get Event Detail",
+    title="Get a Calendar Event Details",
+    annotations={"readOnlyHint": True}
+)
 def get_event_detail(
     ctx: Context,
     event_id: str,
@@ -163,7 +179,11 @@ def get_event_detail(
             f"Error caught while retrieving an event: {str(e)}") from e
 
 
-@mcp.tool()
+@mcp.tool(
+    name="Update Event",
+    title="Update a Calendar Event Details",
+    annotations={"readOnlyHint": True}
+)
 def update_event(
     ctx: Context,
     event_id: str,
@@ -192,7 +212,11 @@ def update_event(
             f"Error caught while updating an event: {str(e)}") from e
 
 
-@mcp.tool()
+@mcp.tool(
+    name="Delete Event",
+    title="Delete a Calendar Event",
+    annotations={"readOnlyHint": True}
+)
 def delete_event(
     ctx: Context,
     event_id: str,
