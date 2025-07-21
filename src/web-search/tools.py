@@ -21,8 +21,9 @@ mcp = FastMCP("web-search")
 
 @mcp.tool(
     name="Web Search",
+    title="Web Search",
     description="Perform a web search using Brave Search API",
-    annotations={"title": "Web Search", "readOnlyHint": True}
+    annotations={"readOnlyHint": True}
 )
 async def web_search(query: str, country: str = "IN") -> str:
     """
@@ -88,8 +89,9 @@ async def web_search(query: str, country: str = "IN") -> str:
 
 @mcp.tool(
     name="Extract Web Page Content",
+    title="Extract Web Page Content",
     description="Extract web page content from URLs using Tavily Extract API.",
-    annotations={"title": "Extract Web Page Content", "readOnlyHint": True}
+    annotations={"readOnlyHint": True}
 )
 async def extract_web_page_content(urls: list[str]) -> str:
     """
