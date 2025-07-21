@@ -287,7 +287,11 @@ def get_air_quality_fields() -> List[str]:
     ]
 
 
-@mcp.tool()
+@mcp.tool(
+    name="Address Geocoding",
+    title="Get Geocoding of a street address",
+    annotations={"readOnlyHint": True}
+)
 async def address_geocoding(address: str) -> str:
     """
     Convert a street address to geographic coordinates (latitude/longitude).
@@ -327,7 +331,11 @@ async def address_geocoding(address: str) -> str:
     return convert_dict_to_markdown(location)
 
 
-@mcp.tool()
+@mcp.tool(
+    name="Search Places",
+    title="Search For Nearby Places",
+    annotations={"readOnlyHint": True}
+)
 async def search_places(
     query: str,
     location: Dict[str, float],
@@ -390,7 +398,11 @@ async def search_places(
     return convert_dict_to_markdown({"places": places})
 
 
-@mcp.tool()
+@mcp.tool(
+    name="Get Route",
+    title="Get route directions between two given locations",
+    annotations={"readOnlyHint": True}
+)
 async def get_route(
     source: str,
     destination: str,
@@ -458,7 +470,11 @@ async def get_route(
     return convert_dict_to_markdown({"routes": routes})
 
 
-@mcp.tool()
+@mcp.tool(
+    name="Get Weather Forecast",
+    title="Retreive weather forecast for a given location",
+    annotations={"readOnlyHint": True}
+)
 async def get_weather_forecast(
     location: Dict[str, float],
     days: int = DEFAULT_FORECAST_DAYS
@@ -517,7 +533,11 @@ async def get_weather_forecast(
     })
 
 
-@mcp.tool()
+@mcp.tool(
+    name="Get Air Quality Forecast",
+    title="Retreive air quality forecast for a given location",
+    annotations={"readOnlyHint": True}
+)
 async def get_air_quality_forecast(
     location: Dict[str, float],
     interval: Dict[str, str],
