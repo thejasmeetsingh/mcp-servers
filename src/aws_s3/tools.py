@@ -133,7 +133,11 @@ async def lifespan(_: FastMCP):
 mcp = FastMCP("aws_s3", lifespan=lifespan)
 
 
-@mcp.tool()
+@mcp.tool(
+    name="Get Buckets",
+    title="Retrive S3 Buckets",
+    annotations={"readOnlyHint": True}
+)
 async def get_buckets(ctx: Context, next_page_token: Optional[str] = None) -> str:
     """
     Retrieve list of S3 buckets.
@@ -183,7 +187,11 @@ async def get_buckets(ctx: Context, next_page_token: Optional[str] = None) -> st
         raise S3ClientError(error_msg) from exc
 
 
-@mcp.tool()
+@mcp.tool(
+    name="Get Bucket Objects",
+    title="Retrive Bucket Objects",
+    annotations={"readOnlyHint": True}
+)
 async def get_bucket_objects(
     ctx: Context,
     bucket: str,
@@ -241,7 +249,11 @@ async def get_bucket_objects(
         raise S3ClientError(error_msg) from exc
 
 
-@mcp.tool()
+@mcp.tool(
+    name="Upload File",
+    title="Upload File To Bucket",
+    annotations={"readOnlyHint": True}
+)
 async def upload_file(
     ctx: Context,
     bucket: str,
@@ -328,7 +340,11 @@ async def upload_file(
         raise S3ClientError(error_msg) from exc
 
 
-@mcp.tool()
+@mcp.tool(
+    name="Delete File",
+    title="Delete File From Bucket",
+    annotations={"readOnlyHint": True}
+)
 async def delete_file(ctx: Context, bucket: str, key: str) -> str:
     """
     Delete a file from an S3 bucket.
@@ -364,7 +380,11 @@ async def delete_file(ctx: Context, bucket: str, key: str) -> str:
         raise S3ClientError(error_msg) from exc
 
 
-@mcp.tool()
+@mcp.tool(
+    name="Download File",
+    title="Download File From Bucket",
+    annotations={"readOnlyHint": True}
+)
 async def download_file(ctx: Context, bucket: str, key: str) -> str:
     """
     Download a file from an S3 bucket to the local data directory.
