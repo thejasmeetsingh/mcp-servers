@@ -6,5 +6,6 @@ venv/
 .vscode/
 .idea/
 static/
+data/
 .env
 *.json
