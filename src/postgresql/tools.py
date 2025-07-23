@@ -82,7 +82,11 @@ class SqlExecutionError(Exception):
     """Raised when SQL query execution fails."""
 
 
-@mcp.tool()
+@mcp.tool(
+    name="Execute SQL",
+    title="Execute PostgreSQL Query",
+    annotations={"readOnlyHint": True}
+)
 async def execute_sql(ctx: Context, query: str) -> str:
     """
     Execute PostgreSQL query with validation and proper error handling.
