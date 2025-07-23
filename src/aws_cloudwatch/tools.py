@@ -121,7 +121,11 @@ async def lifespan(_: FastMCP):
 mcp = FastMCP("aws_cw_logs", lifespan=lifespan)
 
 
-@mcp.tool()
+@mcp.tool(
+    name="Get Log Groups",
+    title="Retrive Log Groups From CloudWatch",
+    annotations={"readOnlyHint": True}
+)
 async def get_log_groups(
     ctx: Context,
     page_size: int = DEFAULT_PAGE_SIZE,
@@ -171,7 +175,11 @@ async def get_log_groups(
         raise CloudWatchClientError(error_msg) from exc
 
 
-@mcp.tool()
+@mcp.tool(
+    name="Get Log Streams",
+    title="Retrive Log Streams From A Log Group",
+    annotations={"readOnlyHint": True}
+)
 async def get_log_streams(
     ctx: Context,
     log_group_name: str,
@@ -238,7 +246,11 @@ async def get_log_streams(
         raise CloudWatchClientError(error_msg) from exc
 
 
-@mcp.tool()
+@mcp.tool(
+    name="Get Log Events",
+    title="Retrive Log Events From A Log Stream & Group",
+    annotations={"readOnlyHint": True}
+)
 async def get_log_events(
     ctx: Context,
     log_group_name: str,
